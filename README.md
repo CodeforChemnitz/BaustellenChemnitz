@@ -3,6 +3,8 @@ BaustellenChemnitz
 
 Extrahiert aktuelle Baustellen von http://chemnitz.de und stellt diese auf einer Karte dar. Entstanden beim OpenDataDay 2014 - **Work in progress**
 
+http://morrisjobke.de/stuff/baustellen-chemnitz/
+
 Was kann es bis jetzt?
 ----------------------
 
