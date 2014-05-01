@@ -1,4 +1,5 @@
 __pycache__
 bower_components
+data*.json
 
 *.pyc
