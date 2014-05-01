@@ -3,7 +3,7 @@ BaustellenChemnitz
 
 Extrahiert aktuelle Baustellen von http://chemnitz.de und stellt diese auf einer Karte dar. Entstanden beim OpenDataDay 2014 - **Work in progress**
 
-http://morrisjobke.de/stuff/baustellen-chemnitz/
+http://codeforchemnitz.de/BaustellenChemnitz/
 
 Was kann es bis jetzt?
 ----------------------
@@ -18,7 +18,6 @@ Selbst ausprobieren
 
 * Python 3.x
 * Python beautifulsoup4 (pip install beautifulsoup4)
-* Bower (npm -g install bower)
 
 Daten extrahieren:
 
@@ -27,15 +26,6 @@ Daten extrahieren:
 Daten mit Geodaten versehen:
 
 	./retrieve.py
-
-Daten anschauen:
-
-	# Abhängigkeiten installieren
-	bower install
-	# Webserver im aktuellen Verzeichnis starten
-	python3 -m http.server
-	# Browser öffnen
-	xdg-open http://localhost:8000/map.html
 
 Tests laufen lassen:
 
