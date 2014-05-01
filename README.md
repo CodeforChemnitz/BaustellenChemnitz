@@ -37,6 +37,11 @@ Daten anschauen:
 	# Browser öffnen
 	xdg-open http://localhost:8000/map.html
 
+Tests laufen lassen:
+
+	cd extractors
+	./date.py
+	./street.py
 
 ToDo
 ----
