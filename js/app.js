@@ -25,7 +25,7 @@ app.controller('MainController', [ '$scope', '$timeout', '$http', 'leafletData',
 		paths: []
 	});
 
-	$http.get('data-parsed.json').then(function(response){
+	$http.get('Baustellen.json').then(function(response){
 		angular.forEach(response.data, function(value){
 			if(value.geodata && value.geodata.length) {
 				var message = 'Einschränkung: ' + value.parsed.restriction + '<br />Maßnahme: ' + value.parsed.action + '<br />Zeitraum: ' + value.parsed.date.since + ' bis ' + value.parsed.date.until;
