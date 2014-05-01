@@ -59,6 +59,9 @@ if __name__ == "__main__":
 			elif key == 'Maßnahme':
 				tmpData['parsed']['action'] = value
 			elif key == 'Lage':
+				# TODO: remove typo correction
+				if value == 'zwischen Hübschmannstraße unf Kanzlerstraße':
+					value = 'zwischen Hübschmannstraße und Kanzlerstraße'
 				try:
 					tmpData['parsed']['location'] = extractors.street.extract(value)
 				except extractors.street.StreetExtractionException as e:
