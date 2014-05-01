@@ -3,10 +3,10 @@ var app = angular.module('RoadWorksChemnitz', ['leaflet-directive']);
 app.controller('MainController', [ '$scope', '$timeout', '$http', 'leafletData', function($scope, $timeout, $http, leafletData) {
 	angular.extend($scope, {
 		defaults: {
-			tileLayer: "http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+			tileLayer: "http://tiles.lyrk.org/ls/{z}/{x}/{y}?apikey=94931f083ee84f43b37e6d230515ab80",
 			tileLayerOptions: {
 				attribution: '&copy; Kartendaten: <a href="http://openstreetmap.org/copyright">OpenStreetMap-Mitwirkende</a>. ' +
-					'Tiles: <a href="http://hot.openstreetmap.org/">Humanitarian OpenStreetMap Team</a> ' +
+					'Tiles: <a href="http://lyrk.de/">Lyrk</a> ' +
 					'Baustellen-Daten: <a href="http://www.chemnitz.de/chemnitz/de/aktuelles/baustellenservice/index.itl">Chemnitz</a>'
 			}
 		},
@@ -25,10 +25,20 @@ app.controller('MainController', [ '$scope', '$timeout', '$http', 'leafletData',
 		paths: []
 	});
 
-	$http.get('Baustellen.json').then(function(response){
+	$http.get('baustellen.json').then(function(response){
 		angular.forEach(response.data, function(value){
 			if(value.geodata && value.geodata.length) {
-				var message = 'Einschränkung: ' + value.parsed.restriction + '<br />Maßnahme: ' + value.parsed.action + '<br />Zeitraum: ' + value.parsed.date.since + ' bis ' + value.parsed.date.until;
+
+				var message = '<dl>';
+
+				message += '<dt>Einschränkung</dt>';
+				message += '<dd>'+ value.parsed.restriction + '</dd>';
+				message += '<dt>Maßnahme</dt>';
+				message += '<dd>'+ value.parsed.action + '</dd>';
+				message += '<dt>Zeitraum</dt>';
+				message += '<dd>'+ value.parsed.date.since + ' bis ' + value.parsed.date.until + '</dd>';
+
+				message += '</dl>'
 				if(value.parsed.location.relation === 'intersection') {
 					angular.forEach(value.geodata, function(geo) {
 						$scope.markers.push({

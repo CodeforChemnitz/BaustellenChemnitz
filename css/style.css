@@ -58,3 +58,12 @@ a {
 a:hover {
 	text-decoration: underline;
 }
+
+dt {
+	font-weight: bold;
+}
+
+dd {
+	padding-left: 20px;
+	-webkit-margin-start: 0;
+}
