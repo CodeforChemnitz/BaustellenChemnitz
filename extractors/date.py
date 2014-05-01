@@ -21,6 +21,8 @@ def extract(dateString):
 	{'since': datetime.date(2013, 5, 10), 'until': datetime.date(2013, 6, 15)}
 	>>> pprint(extract('seit 10.05.2013 bis 15.06.2013'))
 	{'since': datetime.date(2013, 5, 10), 'until': datetime.date(2013, 6, 15)}
+	>>> pprint(extract('10.05.2013 - 15.06.2013'))
+	{'since': datetime.date(2013, 5, 10), 'until': datetime.date(2013, 6, 15)}
 
 	>>> pprint(extract('ab 10.05.2013'))
 	{'since': datetime.date(2013, 5, 10), 'until': None}
@@ -44,7 +46,7 @@ def extract(dateString):
 		data['until'] = date
 		return data
 
-	fromToDate = re.match('^(von|ab|seit)?\s*' + dateRegex + '\s*bis\s*' + dateRegex + ',?\s*(.*)$', dateString)
+	fromToDate = re.match('^(von|ab|seit)?\s*' + dateRegex + '\s*(bis|-)\s*' + dateRegex + ',?\s*(.*)$', dateString)
 	if fromToDate:
 		tmp = fromToDate.groups()
 		sinceDate = datetime.date(
@@ -53,14 +55,12 @@ def extract(dateString):
 			int(tmp[1])
 		)
 		untilDate = datetime.date(
+			int(tmp[7]),
 			int(tmp[6]),
-			int(tmp[5]),
-			int(tmp[4])
+			int(tmp[5])
 		)
 		data['since'] = sinceDate
 		data['until'] = untilDate
-		if tmp[7]:
-			data['notice'] = tmp[7]
 		return data
 
 	fromDate = re.match('^(ab|seit)?\s*' + dateRegex + '$', dateString)
