@@ -40,19 +40,32 @@ def findIntersection(street1, street2, street3=False):
 		content = response.read()
 		data3 = json.loads(content.decode('utf8'))
 		if len(data3['elements']) == 0:
+			print('street3 couldn\'t be found')
 			return []
 
-	if len(data1['elements']) == 0 or len(data2['elements']) == 0:
+	if len(data1['elements']) == 0:
+		print('street1 couldn\'t be found')
+		return []
+	if len(data2['elements']) == 0:
+		print('street2 couldn\'t be found')
 		return []
 
 	nodes1 = []
 	for d in data1['elements']:
 		if d['type'] == 'way':
 			nodes1 = nodes1 + d['nodes']
+
+	if len(nodes1) == 0:
+		print('nodes1 empty')
+
 	nodes2 = []
 	for d in data2['elements']:
 		if d['type'] == 'way':
 			nodes2 = nodes2 + d['nodes']
+
+	if len(nodes2) == 0:
+		print('nodes2 empty')
+
 	if street3:
 		nodes3 = []
 		for d in data3['elements']:
@@ -60,10 +73,16 @@ def findIntersection(street1, street2, street3=False):
 				nodes3 = nodes3 + d['nodes']
 		nodes3 = set(nodes3)
 
+		if len(nodes3) == 0:
+			print('nodes3 empty')
+
 	nodes1 = set(nodes1)
 	nodes2 = set(nodes2)
 
 	sameNodes = list(nodes2.intersection(nodes1))
+
+	if len(sameNodes) == 0:
+		print('sameNodes empty')
 
 	tmp = data1['elements'] + data2['elements']
 
@@ -87,6 +106,9 @@ def findIntersection(street1, street2, street3=False):
 
 		sameNodes2 = list(nodes3.intersection(nodes1))
 
+		if len(sameNodes2) == 0:
+			print('sameNodes2 empty')
+
 		for node1 in sameNodes:
 			for node2 in sameNodes2:
 				for way in ways:
@@ -101,7 +123,7 @@ def findIntersection(street1, street2, street3=False):
 	return result
 
 def extract():
-	f = open('data.json')
+	f = open('data-2014-05-15.19-07.json')
 	data = json.load(f)
 
 	found = []
@@ -115,12 +137,16 @@ def extract():
 			# remove "
 			street2 = street2.replace('"', '')
 			if entry['parsed']['location']['relation'] == 'intersection':
-				print('%2i/%2i process %s %s'%(i, len(data), street1, street2))
+				print('%2i/%2i process - intersection - %s %s'%(i, len(data), street1, street2))
 				geodata = findIntersection(street1, street2)
 			elif entry['parsed']['location']['relation'] == 'between':
 				street3 = entry['parsed']['location']['streets'][1]
-				print('%2i/%2i process %s %s %s'%(i, len(data), street1, street2, street3))
+				print('%2i/%2i process - between - %s %s %s'%(i, len(data), street1, street2, street3))
 				geodata = findIntersection(street1, street2, street3)
+			else:
+				print('%2i/%2i skip - %s'%(i, len(data), entry['parsed']['location']['relation']))
+				continue
+
 			if len(geodata) > 0:
 				print('\tfound')
 				entry['geodata'] = geodata

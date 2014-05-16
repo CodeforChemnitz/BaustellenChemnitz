@@ -30,29 +30,31 @@ def extract(locationString):
 	{'relation': 'townwards-before', 'streets': 'Lange Straße'}
 	>>> pprint(extract('landwärts nach Lange Straße'))
 	{'relation': 'townwards-before', 'streets': 'Lange Straße'}
+	>>> pprint(extract('landwärts Höhe Lange Straße'))
+	{'relation': 'townwards-before', 'streets': 'Lange Straße'}
 
 	"""
 
 	data = {}
-	between = re.match('^zwischen\s*(.*) und (.*)$', locationString)
+	between = re.match('^zwischen\s*(.*) und (.*)\s*$', locationString)
 	if between:
 		data['streets'] = list(between.groups())
 		data['relation'] = 'between'
 		return data
 
-	intersection = re.match('^(Einmündung|in Höhe|Kreuzung)\s*(.*)$', locationString)
+	intersection = re.match('^(Einmündung|in Höhe|Kreuzung)\s*(.*)\s*$', locationString)
 	if intersection:
 		data['streets'] = intersection.group(2).split('/')
 		data['relation'] = 'intersection'
 		return data
 
-	townwards = re.match('^(stadtwärts nach|landwärts vor)\s*(.*)$', locationString)
+	townwards = re.match('^(stadtwärts nach|landwärts vor)\s*(.*)\s*$', locationString)
 	if townwards:
 		data['streets'] = townwards.group(2)
 		data['relation'] = 'townwards-after'
 		return data
 
-	countrywards = re.match('^(stadtwärts vor|landwärts nach)\s*(.*)$', locationString)
+	countrywards = re.match('^(stadtwärts vor|landwärts nach|landwärts Höhe)\s*(.*)\s*$', locationString)
 	if countrywards:
 		data['streets'] = countrywards.group(2)
 		data['relation'] = 'townwards-before'

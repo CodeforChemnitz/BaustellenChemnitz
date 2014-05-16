@@ -62,6 +62,10 @@ if __name__ == "__main__":
 				# TODO: remove typo correction
 				if value == 'zwischen Hübschmannstraße unf Kanzlerstraße':
 					value = 'zwischen Hübschmannstraße und Kanzlerstraße'
+				if value == 'vor Stollberger Straße':
+					value = 'stadtwärts vor Stollberger Straße'
+				if value == 'zwischen Klaffenbacher Weg und Lerchenstraße':
+					value = 'zwischen Klaffenbacher Weg und Lerchenweg'
 				try:
 					tmpData['parsed']['location'] = extractors.street.extract(value)
 				except extractors.street.StreetExtractionException as e:
@@ -78,7 +82,7 @@ if __name__ == "__main__":
 
 		data.append(tmpData)
 
-	f = open('data.json', 'w')
+	f = open('data-' + datetime.datetime.now().strftime('%Y-%m-%d.%H-%M') + '.json', 'w')
 
 	json.dump(data, f, cls=DateTimeEncoder)
 
