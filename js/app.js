@@ -72,6 +72,10 @@ app.controller('MainController', [ '$scope', '$timeout', '$http', 'leafletData',
 
 	$scope.expanded = false;
 
+	if(window.location.hash === '#/expanded=true') {
+		$scope.expanded = true;
+	}
+
 	$scope.toggleExpand = function() {
 		$scope.expanded = !$scope.expanded;
 		leafletData.getMap().then(function(map){
