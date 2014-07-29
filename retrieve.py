@@ -123,7 +123,7 @@ def findIntersection(street1, street2, street3=False):
 	return result
 
 def extract():
-	f = open('data-2014-05-15.19-07.json')
+	f = open('data-2014-05-16.10-25.json')
 	data = json.load(f)
 
 	found = []
