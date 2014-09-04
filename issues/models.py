@@ -21,7 +21,7 @@ class Issue(models.Model):
     location_relation = models.ForeignKey(LocationRelation)
 
 
-class Streets(models.Model):
+class Street(models.Model):
 
     issue = models.ForeignKey(Issue)
     street_name = models.TextField()
