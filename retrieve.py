@@ -15,25 +15,22 @@ def searchStreet(street):
 		print('cache hit: %s '%street)
 		return streetCache[street]
 
-	a = '%3Cosm-script%20output%3D%22json%22%20timeout%3D%2225%22%3E%0A%20%20%20%20%3Cid-query%20type%3D%22area%22%20ref%3D%223600062594%22%20into%3D%22area%22%2F%3E%0A%20%20%20%20%3Cunion%3E%0A%20%20%20%20%20%20%20%20%3Cquery%20type%3D%22way%22%3E%0A%20%20%20%20%20%20%3Chas-kv%20k%3D%22name%22%20v%3D%22'
-	b = '%22%2F%3E%0A%20%20%20%20%20%20%3Carea-query%20from%3D%22area%22%2F%3E%0A%20%20%20%20%3C%2Fquery%3E%0A%20%20%3C%2Funion%3E%0A%20%20%3C%21--%20print%20results%20--%3E%0A%20%20%3Cprint%20mode%3D%22body%22%2F%3E%0A%20%20%3Crecurse%20type%3D%22down%22%2F%3E%0A%20%20%3Cprint%20mode%3D%22skeleton%22%20order%3D%22quadtile%22%2F%3E%0A%3C%2Fosm-script%3E'
-
-	data = '<osm-script>' + \
-		'<osm-script output="json" timeout="25">' + \
-			'<id-query into="area" {{nominatimArea:Chemnitz}} type="area"/>' + \
-			'<union>' + \
-				'<query type="way">' + \
-					'<has-kv k="name" v="PLACEHOLDER"/>' + \
-					'<area-query from="area"/>' + \
-				'</query>' + \
-			'</union>' + \
-			'<print mode="body"/>' + \
-			'<recurse type="down"/>' + \
-			'<print mode="skeleton" order="quadtile"/>' + \
-		'</osm-script>' + \
+	data = '<osm-script output="json" timeout="25">' + \
+		'<id-query into="area" ref="3600062594" type="area"/>' + \
+		'<union>' + \
+			'<query type="way">' + \
+				'<has-kv k="name" v="PLACEHOLDER"/>' + \
+				'<area-query from="area"/>' + \
+			'</query>' + \
+		'</union>' + \
+		'<print mode="body"/>' + \
+		'<recurse type="down"/>' + \
+		'<print mode="skeleton" order="quadtile"/>' + \
 	'</osm-script>'
 
-	response = urllib.request.urlopen("http://overpass-api.de/api/interpreter?data=" + a + urllib.parse.quote(street) + b )
+	data = data.replace('PLACEHOLDER', street)
+
+	response = urllib.request.urlopen("http://overpass-api.de/api/interpreter?data=" + urllib.parse.quote_plus(data))
 	content = response.read()
 	data = json.loads(content.decode('utf8'))
 
