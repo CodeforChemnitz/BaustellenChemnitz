@@ -17,12 +17,23 @@ def searchStreet(street):
 
 	data = '<osm-script output="json" timeout="25">' + \
 		'<id-query into="area" ref="3600062594" type="area"/>' + \
-		'<union>' + \
-			'<query type="way">' + \
-				'<has-kv k="name" v="PLACEHOLDER"/>' + \
-				'<area-query from="area"/>' + \
-			'</query>' + \
-		'</union>' + \
+		'<difference>' + \
+                    '<query type="way">' + \
+                        '<has-kv k="name" v="PLACEHOLDER"/>' + \
+                        '<has-kv k="highway" />' + \
+                        '<area-query from="area"/>' + \
+                    '</query>' + \
+                    '<union>' + \
+                        '<query type="way">' + \
+                            '<has-kv k="highway" v="service"/>' + \
+                            '<area-query from="area"/>' + \
+                        '</query>' + \
+                        '<query type="way">' + \
+                            '<has-kv k="highway" v="track"/>' + \
+                            '<area-query from="area"/>' + \
+                        '</query>' + \
+                    '</union>' + \
+		'</difference>' + \
 		'<print mode="body"/>' + \
 		'<recurse type="down"/>' + \
 		'<print mode="skeleton" order="quadtile"/>' + \
