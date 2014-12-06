@@ -109,15 +109,9 @@ def findIntersection(street1, street2, street3=False):
 
 def findStreet(street):
 	data = searchStreet(street)
-
-	mergedWays = listConcat()
-	for way in data['ways']:
-		mergedWays.add(way)
-
-	ways = mergedWays.get()
 	result = []
-	for way in ways:
-		result += [data['detailed'][n] for n in way]
+	for way in data['ways']:
+		result.append([data['detailed'][n] for n in way])
 	return result
 
 
