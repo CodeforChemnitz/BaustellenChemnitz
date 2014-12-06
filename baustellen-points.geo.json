@@ -1,0 +1,70 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "properties": {
+                "name": "Fahrbahneinschr\u00e4nkungen: Alte Harth"
+            },
+            "geometry": {
+                "coordinates": [
+                    12.9263708,
+                    50.7772329
+                ],
+                "type": "Point"
+            },
+            "type": "Feature"
+        },
+        {
+            "properties": {
+                "name": "Fahrbahneinschr\u00e4nkungen: Margaretenstra\u00dfe, C\u00e4cilienstra\u00dfe"
+            },
+            "geometry": {
+                "coordinates": [
+                    12.9500604,
+                    50.8497196
+                ],
+                "type": "Point"
+            },
+            "type": "Feature"
+        },
+        {
+            "properties": {
+                "name": "Fahrbahneinschr\u00e4nkungen: Winklerstra\u00dfe"
+            },
+            "geometry": {
+                "coordinates": [
+                    12.9055539,
+                    50.8439995
+                ],
+                "type": "Point"
+            },
+            "type": "Feature"
+        },
+        {
+            "properties": {
+                "name": "Vollsperrung - Eine Umleitung ist ausgeschildert.: Uferweg"
+            },
+            "geometry": {
+                "coordinates": [
+                    12.839231,
+                    50.8165293
+                ],
+                "type": "Point"
+            },
+            "type": "Feature"
+        },
+        {
+            "properties": {
+                "name": "halbseitige Fahrbahnsperrung mit Ampelregelung - Die Hoffmannstra\u00dfe ist an der Weststra\u00dfe abgebunden.: Hoffmannstra\u00dfe"
+            },
+            "geometry": {
+                "coordinates": [
+                    12.8957309,
+                    50.8312752
+                ],
+                "type": "Point"
+            },
+            "type": "Feature"
+        }
+    ]
+}
