@@ -1,129 +1,102 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib.request, json, urllib.parse
-from collections import deque
-from helper.listConcat import listConcat
-
+import json, overpy, pprint, glob, networkx as nx
 from scrape import DateTimeEncoder
-import glob
+import matplotlib.pyplot as plt
 
 streetCache = {}
+api = overpy.Overpass()
 
-def searchStreet(street):
+def get_street(street):
+	print('\tsearch street: %s'%street)
 	if street in streetCache:
-		print('cache hit: %s '%street)
+		print('\tcache hit')
 		return streetCache[street]
 
-	data = '<osm-script output="json" timeout="25">' + \
-		'<id-query into="area" ref="3600062594" type="area"/>' + \
-		'<difference>' + \
-                    '<query type="way">' + \
-                        '<has-kv k="name" v="PLACEHOLDER"/>' + \
-                        '<has-kv k="highway" />' + \
-                        '<area-query from="area"/>' + \
-                    '</query>' + \
-                    '<union>' + \
-                        '<query type="way">' + \
-                            '<has-kv k="highway" v="service"/>' + \
-                            '<area-query from="area"/>' + \
-                        '</query>' + \
-                        '<query type="way">' + \
-                            '<has-kv k="highway" v="track"/>' + \
-                            '<area-query from="area"/>' + \
-                        '</query>' + \
-                    '</union>' + \
-		'</difference>' + \
-		'<print mode="body"/>' + \
-		'<recurse type="down"/>' + \
-		'<print mode="skeleton" order="quadtile"/>' + \
-	'</osm-script>'
+	query = '''
+		area(3600062594)->.chemnitz;
+		(
+		    way
+			  ["name"="%s"]
+			  ["highway"]
+			  (area.chemnitz);
+		    -
+		    (
+			way
+			  ["highway"="service"]
+			  (area.chemnitz);
+			way
+			  ["highway"="track"]
+			  (area.chemnitz);
+		    );
+		);
+		out body;
+		>;
+		out skel qt;
+		'''
 
-	data = data.replace('PLACEHOLDER', street)
+	data = api.query(query%street)
 
-	response = urllib.request.urlopen("http://overpass-api.de/api/interpreter?data=" + urllib.parse.quote_plus(data))
-	content = response.read()
-	data = json.loads(content.decode('utf8'))
-
-	if len(data['elements']) == 0:
+	if len(data.get_nodes()) == 0:
 		print('street %s couldn\'t be found'%street)
 		raise Exception
 
-	nodes = []
-	ways = []
-	detailedNodes = {}
-	for d in data['elements']:
-		if d['type'] == 'way':
-			nodes = nodes + d['nodes']
-			ways.append(d['nodes'])
-		if d['type'] == 'node':
-			detailedNodes[d['id']] = {'lng': d['lon'], 'lat': d['lat']}
+	print('\t\tnodes: %i, ways: %s'%(len(data.get_nodes()), len(data.get_ways())))
 
-	if len(nodes) == 0:
-		print('no nodes for street %s'%street)
-		raise Exception
+	streetCache[street] = data
 
-	result = { 'nodes': set(nodes), 'detailed': detailedNodes, 'ways': ways }
+	return data
 
-	streetCache[street] = result
-
-	return result
-
-def findIntersection(street1, street2, street3=False):
+def get_intersection(street1, street2):
+	print('\tsearch intersection between: %s and %s'%(street1, street2))
+	query = '''
+		area(3600062594)->.chemnitz;
+		(
+			way[highway][name="%s"](area.chemnitz); node(w)->.n1;
+			way[highway][name="%s"](area.chemnitz); node(w)->.n2;
+		);
+		node.n1.n2;
+		out meta;
+	'''
 
 	try:
-		data1 = searchStreet(street1)
-		data2 = searchStreet(street2)
-	except Exception:
+		data = api.query(query%(street1, street2))
+	except overpy.exception.OverPyException as e:
+		print('something bad happened: %s'%e)
 		return []
 
+	return data.get_nodes()
 
-	sameNodes = list(data2['nodes'].intersection(data1['nodes']))
-	if len(sameNodes) == 0:
-		print('sameNodes empty')
+def get_street_section(street_name, intersections):
+	street = get_street(street_name)
 
-	allNodes = {}
-	allNodes.update(data1['detailed'])
-	allNodes.update(data2['detailed'])
+	graph = nx.Graph()
 
-	result = []
-	if street3:
-		# specifc way
-		try:
-			data3 = searchStreet(street3)
-		except Exception:
-			return []
+	pos = {}
+	count = 0
+	for way in street.get_ways():
+		print(way.id, ':',[node.id for node in way.get_nodes()])
+		previous_id = False
+		for node in way.get_nodes():
+			# just add edge if previous node is available
+			if previous_id != False:
+				graph.add_edge(previous_id, node.id)
 
-		allNodes.update(data3['detailed'])
+			# set this node as previous one
+			previous_id = node.id
 
-		mergedWays = listConcat()
-		for way in data1['ways']:
-			mergedWays.add(way)
+			pos[node.id] = [int(node.lat * 10000000), int(node.lon * 10000000)]
 
-		ways = mergedWays.get()
+			count += 1
 
-		sameNodes2 = list(data3['nodes'].intersection(data3['nodes']))
+			nx.draw(graph, with_labels=True)
+			plt.savefig('test-%i-%i.png'%(way.id,count))
+			plt.clf()
 
-		if len(sameNodes2) == 0:
-			print('sameNodes2 empty')
 
-		for node1 in sameNodes:
-			for node2 in sameNodes2:
-				for way in ways:
-					if node1 in way and node2 in way:
-						result.append([allNodes[n] for n in way])
-	else:
-		for node in sameNodes:
-			result.append(allNodes[node])
 
-	return result
-
-def findStreet(street):
-	data = searchStreet(street)
-	result = []
-	for way in data['ways']:
-		result.append([data['detailed'][n] for n in way])
-	return result
+	raise SystemExit()
 
 
 def extract():
@@ -134,7 +107,7 @@ def extract():
 		raise SystemExit
 
 	# extract date
-	filename = files[0]
+	filename = files[1]
 	date = filename[5:-5]
 
 	print('file used: %s'%filename)
@@ -154,16 +127,18 @@ def extract():
 			street2 = street2.replace('"', '')
 			if entry['parsed']['location']['relation'] == 'intersection':
 				print('%2i/%2i process - intersection - %s %s'%(i, len(data), street1, street2))
-				geodata = findIntersection(street1, street2)
+				geodata = get_intersection(street1, street2)
 			elif entry['parsed']['location']['relation'] == 'between':
 				street3 = entry['parsed']['location']['streets'][1]
 				print('%2i/%2i process - between - %s %s %s'%(i, len(data), street1, street2, street3))
-				geodata = findIntersection(street1, street2, street3)
+				geodata1 = get_intersection(street1, street2)
+				geodata2 = get_intersection(street1, street3)
+				get_street_section(street1, None)
 			else:
 				print('%2i/%2i skip - %s'%(i, len(data), entry['parsed']['location']['relation']))
 				continue
 
-			if len(geodata) > 0:
+			if len(geodata.get_nodes()) > 0:
 				print('\tfound')
 				entry['geodata'] = geodata
 				found.append(entry)
@@ -173,12 +148,16 @@ def extract():
 		else:
 			print('%2i/%2i'%(i, len(data)))
 
+		break
+
 	f = open('data-parsed-' + date + '.json', 'w')
 	json.dump(found, f, cls=DateTimeEncoder)
 	f.close()
 	f = open('data-parsed-' + date + '-notfound.json', 'w')
 	json.dump(notfound, f, cls=DateTimeEncoder)
 	f.close()
+
+	pprint.pprint(streetCache)
 
 	print('stats: found: %2i/%2i'%(len(found), len(data)))
 
