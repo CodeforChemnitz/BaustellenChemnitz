@@ -17,6 +17,8 @@ def extract(locationString):
 
     >>> pprint(extract('Einmündung Lange Straße/Leipziger Weg'))
     {'relation': 'intersection', 'streets': ['Lange Straße', 'Leipziger Weg']}
+    >>> pprint(extract('Höhe Einmündung Lange Straße/Leipziger Weg'))
+    {'relation': 'intersection', 'streets': ['Lange Straße', 'Leipziger Weg']}
     >>> pprint(extract('in Höhe Lange Straße/Leipziger Weg'))
     {'relation': 'intersection', 'streets': ['Lange Straße', 'Leipziger Weg']}
     >>> pprint(extract('Kreuzung Lange Straße/Leipziger Weg'))
@@ -43,7 +45,7 @@ def extract(locationString):
         data['relation'] = 'between'
         return data
 
-    intersection = re.match('^(Einmündung|in Höhe|Kreuzung)\s*(.*)\s*$', locationString)
+    intersection = re.match('^(Einmündung|Höhe Einmündung|in Höhe|Kreuzung)\s*(.*)\s*$', locationString)
     if intersection:
         data['streets'] = intersection.group(2).split('/')
         data['relation'] = 'intersection'
