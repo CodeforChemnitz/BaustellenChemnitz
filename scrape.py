@@ -19,7 +19,7 @@ class DateTimeEncoder(json.JSONEncoder):
 			return super(DateTimeEncoder, self).default(obj)
 
 if __name__ == "__main__":
-	soup = bs4.BeautifulSoup(urllib.request.urlopen('http://www.chemnitz.de/chemnitz/de/aktuelles/baustellenservice/index.itl'))
+	soup = bs4.BeautifulSoup(urllib.request.urlopen('http://www.chemnitz.de/chemnitz/de/aktuelles/baustellenservice/index.itl'), "html.parser")
 
 	links = soup.select('#col2_content a')
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 			'parsed': {},
 			'content': []
 		}
-		soup = bs4.BeautifulSoup(urllib.request.urlopen('http://www.chemnitz.de/chemnitz/de/aktuelles/baustellenservice/' + link))
+		soup = bs4.BeautifulSoup(urllib.request.urlopen('http://www.chemnitz.de/chemnitz/de/aktuelles/baustellenservice/' + link), "html.parser")
 		box = soup.select('#col2_content')
 		if(len(box) > 1):
 			print('box has not exactly one element - ' + link)
